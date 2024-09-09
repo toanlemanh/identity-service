@@ -1,6 +1,7 @@
 package com.example.identity_service.service;
 
 import com.example.identity_service.dto.request.UserCreationRequest;
+import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.entity.IdenUser;
 import com.example.identity_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,31 @@ public class UserService {
     }
 
     public IdenUser getUserById (String id) {
-        return userRepository.findById(id).get();
+        if (userRepository.findById(id).isPresent() )
+            return userRepository.findById(id).get();
+        return null;
+    }
+
+    public IdenUser updateUserById (String id, UserUpdateRequest request) {
+        IdenUser user = getUserById(id);
+        if ( user != null ) {
+            user.setFirstName(request.getFirstName());
+            user.setLastName(request.getLastName());
+            user.setPassword(request.getPassword());
+            user.setDob(request.getDob());
+            return userRepository.save(user);
+        }
+        return null;
+    }
+
+    // Hard delete
+    public boolean deleteUserById (String id) {
+        if ( userRepository.existsById(id) ){
+            // delete by id
+            userRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 
 }
