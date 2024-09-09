@@ -1,39 +1,12 @@
-package com.example.identity_service.entity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+package com.example.identity_service.dto.request;
 
 import java.time.LocalDate;
 
-// Table
-@Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private long id;
-
-    private String username;
+public class UserUpdateRequest {
     private String password;
     private String firstName;
     private String lastName;
     private LocalDate dob;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     public String getPassword() {
         return password;
