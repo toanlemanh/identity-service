@@ -23,7 +23,7 @@ A working knowledge of the Java language and Java ecosystem
   <li>Spring  JDA</li>
   <li>MySQL Connector</li>
 </ul>
-<img src=https://github.com/user-attachments/assets/ecc8305c-68cd-4792-a84e-233c8fb5cc55>
+
 
 # ⚒️ How to build
 <p>
