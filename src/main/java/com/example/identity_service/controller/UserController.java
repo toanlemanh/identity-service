@@ -5,6 +5,7 @@ import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.entity.IdenUser;
 import com.example.identity_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -44,19 +45,15 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<IdenUser> getUserById (@PathVariable String id) {
         IdenUser user = userService.getUserById(id);
-        if ( user != null )
-          return ResponseEntity.ok( user );
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok( user );
+        // else throw 404 in exception folder
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<IdenUser> updateUserById (@PathVariable String id, @RequestBody UserUpdateRequest request){
+    public ResponseEntity<String> updateUserById (@PathVariable String id, @RequestBody UserUpdateRequest request){
         // dispatch
         IdenUser user = userService.updateUserById(id, request);
-        if ( user != null ){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
