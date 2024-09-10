@@ -4,6 +4,7 @@ import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.entity.IdenUser;
 import com.example.identity_service.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createUser (@RequestBody UserCreationRequest request, UriComponentsBuilder ucb){
+    public ResponseEntity<Void> createUser (@RequestBody @Valid UserCreationRequest request, UriComponentsBuilder ucb){
         // dispatch
         IdenUser user = userService.createUser(request);
         if (user != null){
@@ -50,7 +51,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUserById (@PathVariable String id, @RequestBody UserUpdateRequest request){
+    public ResponseEntity<String> updateUserById (@PathVariable String id, @RequestBody @Valid UserUpdateRequest request){
         // dispatch
         IdenUser user = userService.updateUserById(id, request);
         return ResponseEntity.noContent().build();

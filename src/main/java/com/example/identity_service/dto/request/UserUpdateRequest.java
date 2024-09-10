@@ -1,8 +1,11 @@
 package com.example.identity_service.dto.request;
 
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 
 public class UserUpdateRequest {
+    @Size(min = 8, message = "Password must be long at 8 characters")
     private String password;
     private String firstName;
     private String lastName;
