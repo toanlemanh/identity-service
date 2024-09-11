@@ -1,13 +1,15 @@
 package com.example.identity_service.dto.request;
 
+import com.example.identity_service.exception.ErrorCode;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
 public class UserCreationRequest {
-    @Size(min = 8, message = "Username must be long at 8 characters")
+    //Cannot call getErrorCode from Enum ErrorCode.INVALID_USERNAME
+    @Size(min = 8, message = "INVALID_USERNAME" )
     private String username;
-    @Size(min = 8, message = "Password must be long at 8 characters")
+    @Size(min = 8, message = "INVALID_PASSWORD")
     private String password;
     private String firstName;
     private String lastName;

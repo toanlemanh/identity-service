@@ -5,7 +5,9 @@ package com.example.identity_service.exception;
  */
 public enum ErrorCode {
     USER_EXISTS(4000, "User existed!"),
-    INVALID_USER_FIELD(4001, "Invalid field!"),
+    INVALID_MESSAGE_KEY (4001, "[DEV] Invalid message key!"),
+    INVALID_USERNAME(4002, "Username must be at least 8 characters!"),
+    INVALID_PASSWORD(4003, "Password must be at least 8 characters!"),
     USER_NOT_FOUND(4004, "User is not found!"),
     UNCATEGORIZED_ERROR (4444, "Uncategorized error !")
 

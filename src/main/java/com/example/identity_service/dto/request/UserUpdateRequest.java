@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public class UserUpdateRequest {
-    @Size(min = 8, message = "Password must be long at 8 characters")
+    @Size(min = 8, message = "INVALID_PASSWORD")
     private String password;
     private String firstName;
     private String lastName;
