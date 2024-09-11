@@ -4,6 +4,7 @@ import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.entity.IdenUser;
 import com.example.identity_service.exception.DuplicationException;
+import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.exception.NotFoundException;
 import com.example.identity_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class UserService {
     public IdenUser createUser (UserCreationRequest request) {
         // handle request
         if ( userRepository.existsByUsername( request.getUsername() ) )
-             throw new DuplicationException("Username exists!!");
+             throw new DuplicationException(ErrorCode.USER_EXISTS);
 
         IdenUser user = new IdenUser();
         // Username must be unique
@@ -37,7 +38,7 @@ public class UserService {
     }
 
     public IdenUser getUserById (String id) {
-       return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User is not found!"));
+       return userRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     public IdenUser updateUserById (String id, UserUpdateRequest request) {

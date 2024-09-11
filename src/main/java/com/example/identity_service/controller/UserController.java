@@ -1,5 +1,6 @@
 package com.example.identity_service.controller;
 
+import com.example.identity_service.dto.request.ApiResponse;
 import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.entity.IdenUser;
@@ -43,11 +44,17 @@ public class UserController {
             return ResponseEntity.ok( users );
     }
 
+//    @GetMapping("/{id}")
+//    public ResponseEntity<IdenUser> getUserById (@PathVariable String id) {
+//        IdenUser user = userService.getUserById(id);
+//        return ResponseEntity.ok( user );
+//        // else throw 404 in exception folder
+//    }
     @GetMapping("/{id}")
-    public ResponseEntity<IdenUser> getUserById (@PathVariable String id) {
-        IdenUser user = userService.getUserById(id);
-        return ResponseEntity.ok( user );
-        // else throw 404 in exception folder
+    public ApiResponse<IdenUser> getUserById (@PathVariable String id){
+        ApiResponse<IdenUser> response = new ApiResponse<>();
+        response.setResult( userService.getUserById(id) );
+        return response;
     }
 
     @PutMapping("/{id}")
