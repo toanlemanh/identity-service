@@ -1,10 +1,13 @@
 package com.example.identity_service.controller;
 
+import com.example.identity_service.dto.request.ApiResponse;
 import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.entity.IdenUser;
 import com.example.identity_service.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,7 +24,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createUser (@RequestBody UserCreationRequest request, UriComponentsBuilder ucb){
+    public ResponseEntity<Void> createUser (@RequestBody @Valid UserCreationRequest request, UriComponentsBuilder ucb){
         // dispatch
         IdenUser user = userService.createUser(request);
         if (user != null){
@@ -41,22 +44,24 @@ public class UserController {
             return ResponseEntity.ok( users );
     }
 
+//    @GetMapping("/{id}")
+//    public ResponseEntity<IdenUser> getUserById (@PathVariable String id) {
+//        IdenUser user = userService.getUserById(id);
+//        return ResponseEntity.ok( user );
+//        // else throw 404 in exception folder
+//    }
     @GetMapping("/{id}")
-    public ResponseEntity<IdenUser> getUserById (@PathVariable String id) {
-        IdenUser user = userService.getUserById(id);
-        if ( user != null )
-          return ResponseEntity.ok( user );
-        return ResponseEntity.notFound().build();
+    public ApiResponse<IdenUser> getUserById (@PathVariable String id){
+        ApiResponse<IdenUser> response = new ApiResponse<>();
+        response.setResult( userService.getUserById(id) );
+        return response;
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<IdenUser> updateUserById (@PathVariable String id, @RequestBody UserUpdateRequest request){
+    public ResponseEntity<String> updateUserById (@PathVariable String id, @RequestBody @Valid UserUpdateRequest request){
         // dispatch
         IdenUser user = userService.updateUserById(id, request);
-        if ( user != null ){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
