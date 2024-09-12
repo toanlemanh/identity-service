@@ -1,4 +1,4 @@
-package com.example.identity_service.dto.request;
+package com.example.identity_service.dto.response;
 
 // This class for refining a standard API response for this service
 // provide user with data integrity and error handling

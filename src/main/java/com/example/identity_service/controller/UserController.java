@@ -1,20 +1,18 @@
 package com.example.identity_service.controller;
 
-import com.example.identity_service.dto.request.ApiResponse;
+import com.example.identity_service.dto.response.ApiResponse;
 import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.entity.IdenUser;
 import com.example.identity_service.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -24,24 +22,26 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("")
-    public ResponseEntity<Void> createUser (@RequestBody @Valid UserCreationRequest request, UriComponentsBuilder ucb){
-        // dispatch
+    public ResponseEntity<ApiResponse> createUser (@RequestBody @Valid UserCreationRequest request, UriComponentsBuilder ucb){
+        // dispatch service
         IdenUser user = userService.createUser(request);
-        if (user != null){
             // build URL
             URI url = ucb
                     .path("/users/{id}")
                     .buildAndExpand(user.getId())
                     .toUri();
-            return ResponseEntity.created(url).build();
-        }
-        return ResponseEntity.notFound().build();
+
+            // prepare body with code 1000
+            ApiResponse response = new ApiResponse();
+            return ResponseEntity.created(url).body(response);
     }
 
     @GetMapping("")
-    public ResponseEntity<List<IdenUser>> listUsers () {
+    public ApiResponse<List<IdenUser>> listUsers () {
+        ApiResponse<List<IdenUser>> response = new ApiResponse<>();
         List<IdenUser> users = userService.listUsers();
-            return ResponseEntity.ok( users );
+        response.setResult( users );
+        return response;
     }
 
 //    @GetMapping("/{id}")
@@ -58,17 +58,17 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUserById (@PathVariable String id, @RequestBody @Valid UserUpdateRequest request){
+    public ResponseEntity<ApiResponse> updateUserById (@PathVariable String id, @RequestBody @Valid UserUpdateRequest request){
         // dispatch
         userService.updateUserById(id, request);
-        return ResponseEntity.noContent().build();
+        ApiResponse response = new ApiResponse();
+        // if 204 NO CONTENT automatically then no content is added => switch to 200
+        return ResponseEntity.status(200).body(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserById (@PathVariable String id){
-        if (userService.deleteUserById( id )) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        userService.deleteUserById( id );
+        return ResponseEntity.noContent().build();
     }
 }

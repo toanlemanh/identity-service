@@ -22,13 +22,13 @@ public class UserService {
 
     public IdenUser createUser (UserCreationRequest request) {
         // handle request
-        if ( userRepository.existsByUsername( request.getUsername() ) )
+        if ( userRepository.existsByUsername(request.getUsername()) )
              throw new DuplicationException(ErrorCode.USER_EXISTS);
 
-        // mapstruct to binding data between dtos
+        // mapstruct to binding data between dto
         IdenUser user = userMapper.toUser(request);
         // Removed manual updating
-        //save and return entity to Controller
+        //save and return entity to Controller to build header location
         return userRepository.save(user);
     }
 
@@ -51,13 +51,12 @@ public class UserService {
     }
 
     // Hard delete
-    public boolean deleteUserById (String id) {
+    public void deleteUserById (String id) {
         if ( userRepository.existsById(id) ){
             // delete by id
             userRepository.deleteById(id);
-            return true;
         }
-        return false;
+        else throw new NotFoundException(ErrorCode.USER_NOT_FOUND);
     }
 
 }
