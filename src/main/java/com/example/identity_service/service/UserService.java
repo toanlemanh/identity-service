@@ -6,6 +6,7 @@ import com.example.identity_service.entity.IdenUser;
 import com.example.identity_service.exception.DuplicationException;
 import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.exception.NotFoundException;
+import com.example.identity_service.mapper.UserMapper;
 import com.example.identity_service.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,20 +17,17 @@ import java.util.List;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserMapper userMapper;
 
     public IdenUser createUser (UserCreationRequest request) {
         // handle request
         if ( userRepository.existsByUsername( request.getUsername() ) )
              throw new DuplicationException(ErrorCode.USER_EXISTS);
 
-        IdenUser user = new IdenUser();
-        // Username must be unique
         // mapstruct to binding data between dtos
-        user.setUsername(request.getUsername());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setPassword(request.getPassword());
-        user.setDob(request.getDob());
+        IdenUser user = userMapper.toUser(request);
+        // Removed manual updating
         //save and return entity to Controller
         return userRepository.save(user);
     }
@@ -42,16 +40,14 @@ public class UserService {
        return userRepository.findById(id).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public IdenUser updateUserById (String id, UserUpdateRequest request) {
+    public void updateUserById (String id, UserUpdateRequest request) {
         IdenUser user = getUserById(id);
+        // if not user, throw exception above
         if ( user != null ) {
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
-            user.setPassword(request.getPassword());
-            user.setDob(request.getDob());
-            return userRepository.save(user);
+            userMapper.toUpdateUser(user, request);
+            //removed boilerplate code, leave it for mapstruct
+            userRepository.save(user);
         }
-        return null;
     }
 
     // Hard delete

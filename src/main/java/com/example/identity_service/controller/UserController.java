@@ -60,7 +60,7 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<String> updateUserById (@PathVariable String id, @RequestBody @Valid UserUpdateRequest request){
         // dispatch
-        IdenUser user = userService.updateUserById(id, request);
+        userService.updateUserById(id, request);
         return ResponseEntity.noContent().build();
     }
 
