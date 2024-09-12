@@ -24,6 +24,7 @@ public class UserService {
 
         IdenUser user = new IdenUser();
         // Username must be unique
+        // mapstruct to binding data between dtos
         user.setUsername(request.getUsername());
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
