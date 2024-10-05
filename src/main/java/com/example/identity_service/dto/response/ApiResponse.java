@@ -5,6 +5,7 @@ package com.example.identity_service.dto.response;
 // Don't include null field
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data; // include RequireArgsConstructor
 import lombok.Getter;
 import lombok.Setter;

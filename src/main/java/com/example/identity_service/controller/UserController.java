@@ -26,7 +26,6 @@ public class UserController {
 
    // remove Autowired
     UserService userService;
-
     @PostMapping("")
     public ResponseEntity<ApiResponse> createUser (@RequestBody @Valid UserCreationRequest request, UriComponentsBuilder ucb){
         // dispatch service
