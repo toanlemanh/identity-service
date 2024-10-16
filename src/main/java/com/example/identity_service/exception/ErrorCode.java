@@ -10,7 +10,8 @@ public enum ErrorCode {
     INVALID_PASSWORD(4003, "Password must be at least 8 characters!"),
     USER_NOT_FOUND(4004, "User is not found!"),
     UNCATEGORIZED_ERROR (4444, "Uncategorized error !"),
-    USER_NOT_EXIST ( 4005, "User does not exist")
+    USER_NOT_EXIST ( 4005, "User does not exist"),
+    UNAUTHENTICATED (4006, "Unauthenticated!")
 
     ;
 
