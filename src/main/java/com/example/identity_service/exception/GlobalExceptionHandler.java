@@ -1,6 +1,7 @@
 package com.example.identity_service.exception;
 
 import com.example.identity_service.dto.response.ApiResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,6 +21,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(value = UnauthenticatedException.class)
+    public ResponseEntity<ApiResponse> handlingUnauthenticatedException(UnauthenticatedException exception){
+        ApiResponse response = new ApiResponse();
+        response.setCode( exception.getErrorCode().getCode());
+        response.setMessage( exception.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body( response );
+    }
     @ExceptionHandler(value = DuplicationException.class)
     public ResponseEntity<ApiResponse> handlingDuplicationException( DuplicationException exception ){
         ApiResponse response = new ApiResponse();

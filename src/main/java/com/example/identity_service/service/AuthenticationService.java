@@ -7,6 +7,7 @@ import com.example.identity_service.entity.IdenUser;
 import com.example.identity_service.exception.AppException;
 import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.exception.NotFoundException;
+import com.example.identity_service.exception.UnauthenticatedException;
 import com.example.identity_service.repository.UserRepository;
 import com.fasterxml.jackson.databind.util.JSONWrappedObject;
 import com.google.common.hash.Hashing;
@@ -39,11 +40,6 @@ public class AuthenticationService {
     @NonFinal
     protected static final String SIGNER_KEY = "vnCY1rsDKUZU+AZ7Rx9eR6Erno0dw8ittihP9vmhAa28VD0e6c3JCxPHQUaL1dgy";
 
-    String header = "{ \" type \" : \" JWT\", \" alg\" : \" HS256\" }";
-    String payload = "{ \" username\" : \" %s\", \" password\" : \" %s\" }";
-    String salt = "toantom123";
-    String jwtTemplate = "{ %s, %s, %s }";
-
     public AuthenticationResponse authenticate (AuthenticationRequest request) {
         String encodingText = "";
 
@@ -53,7 +49,7 @@ public class AuthenticationService {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         boolean authenticated =  encoder.matches(request.getPassword(), user.getPassword());
         if( !authenticated ) {
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+            throw new UnauthenticatedException(ErrorCode.UNAUTHENTICATED);
         }
         String token = generateToken(request.getUsername());
 
