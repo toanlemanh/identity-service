@@ -9,6 +9,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class IntrospectRequest {
-    // token from each user request
+    // just token from each user request
+    // it's unchanged
+    // if not token => prevent authentication, immediately not allowing access
     String token;
 }
