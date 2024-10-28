@@ -36,6 +36,11 @@
 		<nimbus-jose-jwt.version>9.41.2</nimbus-jose-jwt.version>
 	</properties>
 	<dependencies>
+<!--		OAUTH2 Spring Security-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
 <!--		guava hashing algorithm-->
 		<dependency>
 			<groupId>com.google.guava</groupId>
