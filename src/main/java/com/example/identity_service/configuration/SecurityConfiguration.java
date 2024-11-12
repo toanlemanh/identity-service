@@ -4,12 +4,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -20,7 +20,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfiguration {
 
     private final String [] PUBLIC_ENDPOINT = {
-            "/users", "/auth/token", "/auth/introspect"
+             "/auth/token", "/auth/introspect", "/users"
     };
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;
@@ -29,14 +29,20 @@ public class SecurityConfiguration {
 //        protect endpoint: register, login
         httpSecurity.authorizeHttpRequests(request -> request
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
-                .anyRequest().authenticated()
+                        .anyRequest().authenticated()
+//                .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
+
         );
 //        disbale seasurf
         httpSecurity.csrf(request -> request.disable());
 // utilize oauth2 resource server => register a ProviderManager
+        //cmt di chay lai thi van duoc
 // Figure: https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html#oauth2resourceserver-jwt-architecture
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigure ->
+//      Ta can dang ki mot Authentication Provider (cu the la JWT Authentication Provider)
+//      voi Provider Manager => Tiep tuc config JWT Authentication Provider
+//      overriding default JWTDecoder
                         jwtConfigure.decoder( jwtDecoder())));
         return httpSecurity.build();
     }
@@ -51,5 +57,9 @@ public class SecurityConfiguration {
                 .macAlgorithm(MacAlgorithm.HS512)
                 .build();
         return nimbusJwtDecoder;
+    }
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder(10);
     }
 }

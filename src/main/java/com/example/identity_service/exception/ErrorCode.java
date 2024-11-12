@@ -11,7 +11,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(4004, "User is not found!"),
     UNCATEGORIZED_ERROR (4444, "Uncategorized error !"),
     USER_NOT_EXIST ( 4005, "User does not exist"),
-    UNAUTHENTICATED (4006, "Unauthenticated!")
+    UNAUTHENTICATED (4006, "Unauthenticated!"),
+    NO_CONTENT(2004, "No Content!")
 
     ;
 

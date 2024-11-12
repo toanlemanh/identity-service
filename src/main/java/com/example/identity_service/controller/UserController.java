@@ -5,11 +5,13 @@ import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.dto.response.UserResponse;
 import com.example.identity_service.entity.IdenUser;
+import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -29,32 +32,27 @@ public class UserController {
     @PostMapping("")
     public ResponseEntity<ApiResponse> createUser (@RequestBody @Valid UserCreationRequest request, UriComponentsBuilder ucb){
         // dispatch service
-        IdenUser user = userService.createUser(request);
+        UserResponse userResponse = userService.createUser(request);
             // build URL
             URI url = ucb
                     .path("/users/{id}")
-                    .buildAndExpand(user.getId())
+                    .buildAndExpand(userResponse.getId())
                     .toUri();
 
             // prepare body with code 1000
             ApiResponse response = new ApiResponse();
+            response.setResult(userResponse);
             return ResponseEntity.created(url).body(response);
     }
-
+//
     @GetMapping("")
-    public ApiResponse<List<IdenUser>> listUsers () {
-        ApiResponse<List<IdenUser>> response = new ApiResponse<>();
-        List<IdenUser> users = userService.listUsers();
+    public ApiResponse<Stream> listUsers () {
+        ApiResponse response = new ApiResponse();
+        Stream users = userService.listUsers();
         response.setResult( users );
         return response;
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<IdenUser> getUserById (@PathVariable String id) {
-//        IdenUser user = userService.getUserById(id);
-//        return ResponseEntity.ok( user );
-//        // else throw 404 in exception folder
-//    }
     @GetMapping("/{id}")
     public ApiResponse<UserResponse> getUserById (@PathVariable String id){
         ApiResponse<UserResponse> response = new ApiResponse<>();
@@ -65,10 +63,18 @@ public class UserController {
     @PutMapping("/{id}")
     public ApiResponse<UserResponse> updateUserById (@PathVariable String id, @RequestBody @Valid UserUpdateRequest request){
         // dispatch
-        UserResponse user = userService.updateUserById(id, request);
+        UserResponse userResponse = userService.updateUserById(id, request);
+        String after = userResponse.getFirstName() + userResponse.getLastName()
+                + userResponse.getDob();
+        String before = request.getFirstName() + request.getLastName()
+                + request.getDob();
         ApiResponse<UserResponse> response = new ApiResponse<>();
+        response.setResult(userResponse);
         // if 204 NO CONTENT automatically then no content is added => switch to 200
-        response.setResult(user);
+        if (before.equals(after)) {
+            response.setMessage(ErrorCode.NO_CONTENT.getErrorMessage());
+            response.setCode(ErrorCode.NO_CONTENT.getCode());
+        }
         return response;
     }
 

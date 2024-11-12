@@ -51,6 +51,7 @@ public class AuthenticationController {
     }
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request) throws JOSEException, ParseException {
+        System.out.println("token: " + request.getToken());
         ApiResponse<IntrospectResponse> response = new ApiResponse<>();
       // check token
         IntrospectResponse result = authenticationService.introspectToken(request);

@@ -5,6 +5,7 @@ import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.dto.response.UserResponse;
 import com.example.identity_service.entity.IdenUser;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 //generate mapper using in Spring (DI)
@@ -13,6 +14,9 @@ import org.mapstruct.MappingTarget;
 public interface UserMapper {
     // map Creation request to entity
     IdenUser toUser(UserCreationRequest request);
+    @Mapping(target = "username", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "roles", ignore = true)
     void toUpdateUser(@MappingTarget IdenUser user, UserUpdateRequest request);
 
     // map entity to dto response

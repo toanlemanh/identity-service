@@ -4,6 +4,7 @@ import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.dto.response.UserResponse;
 import com.example.identity_service.entity.IdenUser;
+import com.example.identity_service.enums.Role;
 import com.example.identity_service.exception.DuplicationException;
 import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.exception.NotFoundException;
@@ -17,7 +18,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor // Constructor dependency injection => remove @Autowired
@@ -28,13 +31,17 @@ public class UserService {
      UserRepository userRepository;
      UserMapper userMapper;
 
-    public IdenUser createUser (UserCreationRequest request) {
+    public UserResponse createUser (UserCreationRequest request) {
         // handle request
         if ( userRepository.existsByUsername(request.getUsername()) )
              throw new DuplicationException(ErrorCode.USER_EXISTS);
 
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Role.USER.name());
+
         // mapstruct to binding data between dto
         IdenUser user = userMapper.toUser(request);
+        user.setRoles(roles);
         // encrypt password => set password in user entity, not in request ??
         // avoid leaking UserCreationRequest
         PasswordEncoder bcryptEncoder = new BCryptPasswordEncoder(10);
@@ -42,11 +49,13 @@ public class UserService {
         System.out.println(user.getPassword());
         // Removed manual updating
         //save and return entity to Controller to build header location
-        return userRepository.save(user);
+
+        // map IdenUser back to DTO (UserResponse) then return it
+        return userMapper.toUserResponse( userRepository.save(user));
     }
 
-    public List<IdenUser> listUsers () {
-        return userRepository.findAll();
+    public Stream listUsers () {
+        return userRepository.findAll().stream().map(user -> userMapper.toUserResponse(user));
     }
 
     public UserResponse getUserById (String id) {
@@ -58,15 +67,18 @@ public class UserService {
     }
 
     public UserResponse updateUserById (String id, UserUpdateRequest request) {
+        //this endpoint does not allow update the username, role and password
         IdenUser user = userRepository
                             .findById(id)
                             .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        // But we cannot set the role here => need to check the requested role
+        // and the current privilege role
         // if wrong user id, throw exception above
         // else map data request to entity using mapstruct
-            userMapper.toUpdateUser(user, request);
-            // continue map entity to dto response
-           UserResponse response = userMapper.toUserResponse(userRepository.save(user) );
-           return response;
+        userMapper.toUpdateUser(user, request);
+        // continue map entity to dto response
+        UserResponse response = userMapper.toUserResponse(userRepository.save(user));
+        return response;
     }
 
     // Hard delete
