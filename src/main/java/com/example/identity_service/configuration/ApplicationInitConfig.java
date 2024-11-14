@@ -22,7 +22,6 @@ import java.util.HashSet;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class ApplicationInitConfig {
-
     PasswordEncoder passwordEncoder;
 
     @Bean

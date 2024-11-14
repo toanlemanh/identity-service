@@ -70,7 +70,7 @@ public class AuthenticationService {
 
     /**
      *
-     * @param username
+     * @param user
      * @alg JWSObject => object contains JWSHeader, Payload
      * JWSHeader stores hash algorithm information
      * Payload => JWTClaimsSet
@@ -115,7 +115,7 @@ public class AuthenticationService {
         Set<String> roles = user.getRoles();
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (! CollectionUtils.isEmpty( roles )){
-            roles.forEach(s -> stringJoiner.add(s));
+            roles.forEach(role -> stringJoiner.add(role));
         }
         return stringJoiner.toString();
     }

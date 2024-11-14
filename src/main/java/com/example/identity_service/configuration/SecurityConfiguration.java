@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -22,6 +24,8 @@ public class SecurityConfiguration {
     private final String [] PUBLIC_ENDPOINT = {
              "/auth/token", "/auth/introspect", "/users"
     };
+    private final String ADMIN = "ROLE_ADMIN";
+    private final String USER = "ROLE_USER";
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;
     @Bean
@@ -29,8 +33,10 @@ public class SecurityConfiguration {
 //        protect endpoint: register, login
         httpSecurity.authorizeHttpRequests(request -> request
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/users/**").hasAuthority(ADMIN)
+                .requestMatchers(HttpMethod.GET, "/users").hasAuthority(ADMIN)
+                //or use hasRole(Role.ADMIN.name)
                         .anyRequest().authenticated()
-//                .requestMatchers(HttpMethod.GET, "/users").hasRole(Role.ADMIN.name())
 
         );
 //        disbale seasurf
@@ -43,7 +49,11 @@ public class SecurityConfiguration {
 //      Ta can dang ki mot Authentication Provider (cu the la JWT Authentication Provider)
 //      voi Provider Manager => Tiep tuc config JWT Authentication Provider
 //      overriding default JWTDecoder
-                        jwtConfigure.decoder( jwtDecoder())));
+//      3 jobs: decodes, verifies and validates JWT
+                        jwtConfigure.decoder( jwtDecoder() )
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+//        JWTAuthenticationConverter
+//        => convert JWT to Collection of Authorities
         return httpSecurity.build();
     }
 
@@ -57,6 +67,17 @@ public class SecurityConfiguration {
                 .macAlgorithm(MacAlgorithm.HS512)
                 .build();
         return nimbusJwtDecoder;
+    }
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter(){
+//      customize SCOPE_ADMIN to Role or sth looks familiar
+//        AuthenticationConverter => Granted converter + PrincipalClaimName (issuer)
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
     }
     @Bean
     public PasswordEncoder passwordEncoder(){

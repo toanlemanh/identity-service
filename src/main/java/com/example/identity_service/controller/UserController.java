@@ -11,9 +11,12 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,6 +28,7 @@ import java.util.stream.Stream;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController
 @RequestMapping("/users")
+@Slf4j
 public class UserController {
 
    // remove Autowired
@@ -44,9 +48,21 @@ public class UserController {
             response.setResult(userResponse);
             return ResponseEntity.created(url).body(response);
     }
-//
+
+    /**
+     * Endpoint belongs to ADMIN => check authorities first
+     * To know who are authenticated in the system => use SecurityContextHolder => getContext => getAuthentication
+     * Authentication => getName, getAuthorities
+     * @return
+     */
     @GetMapping("")
     public ApiResponse<Stream> listUsers () {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Username >>" + authentication.getName());
+//        Print the list of authorities
+        authentication.getAuthorities().forEach(
+                grantedAuthority -> log.info("Granted authority >> "+ grantedAuthority)
+        );
         ApiResponse response = new ApiResponse();
         Stream users = userService.listUsers();
         response.setResult( users );
@@ -54,6 +70,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+//    Chi cho phep user xem duoc dung thong tin cua minh
+//    Check jwt claim set => issuer => get id === id
     public ApiResponse<UserResponse> getUserById (@PathVariable String id){
         ApiResponse<UserResponse> response = new ApiResponse<>();
         response.setResult( userService.getUserById(id) );
