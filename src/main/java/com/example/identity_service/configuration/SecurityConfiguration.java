@@ -33,7 +33,6 @@ public class SecurityConfiguration {
 //        protect endpoint: register, login
         httpSecurity.authorizeHttpRequests(request -> request
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/users/**").hasAuthority(ADMIN)
                 .requestMatchers(HttpMethod.GET, "/users").hasAuthority(ADMIN)
                 //or use hasRole(Role.ADMIN.name)
                         .anyRequest().authenticated()

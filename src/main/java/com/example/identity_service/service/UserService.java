@@ -65,6 +65,13 @@ public class UserService {
                        .findById(id)
                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND)));
     }
+    public UserResponse getUserByName (String name) {
+        return userMapper.toUserResponse(
+                //find IdenUser first then map to UserResponse (dto)
+                userRepository
+                        .findByUsername(name)
+                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND)));
+    }
 
     public UserResponse updateUserById (String id, UserUpdateRequest request) {
         //this endpoint does not allow update the username, role and password

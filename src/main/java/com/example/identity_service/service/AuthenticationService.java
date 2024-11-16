@@ -135,9 +135,6 @@ public class AuthenticationService {
         Date issueTime = signedJWT.getJWTClaimsSet().getIssueTime();
         Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
         System.out.println("receive" +  issueTime+" to "+expiryTime);
-/**
- * WHY my EXpiration time getting from JWTClaimsSet is not similar to the original
- */
         // after expiration time => it does not valid
         verified = signedJWT.verify(verifier) && expiryTime.after(new Date());
 
