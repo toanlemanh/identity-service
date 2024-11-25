@@ -13,7 +13,11 @@ import com.example.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor // Constructor dependency injection => remove @Autowired
 //Create UserController constructor inject UserRepository and UserMapper
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 // make all field with not accessory being final
 public class UserService {
      UserRepository userRepository;
@@ -54,16 +59,34 @@ public class UserService {
         return userMapper.toUserResponse( userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+//    Tao ra proxy truoc khi goi ham => Request phai co role ADMIN
     public Stream listUsers () {
+        log.info("In method list all users");
         return userRepository.findAll().stream().map(user -> userMapper.toUserResponse(user));
     }
-
+    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUserById (String id) {
+        log.info("Ony if authenticated, this method will be called");
        return userMapper.toUserResponse(
                //find IdenUser first then map to UserResponse (dto)
                userRepository
                        .findById(id)
                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND)));
+    }
+    @PostAuthorize("returnObject.username == authentication.name")
+    public UserResponse getMyInfo (){
+        log.info("Despite authentication, this method is still called");
+        String userName = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return userMapper.toUserResponse(
+                userRepository
+                        .findByUsername(userName)
+                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND))
+        );
     }
     public UserResponse getUserByName (String name) {
         return userMapper.toUserResponse(

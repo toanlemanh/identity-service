@@ -69,6 +69,13 @@ public class UserController {
         return response;
     }
 
+    @GetMapping("/myInfo")
+    public ApiResponse<UserResponse> getMyInfo(){
+        ApiResponse response = new ApiResponse();
+        response.setResult( userService.getMyInfo() );
+        return response;
+    }
+
     @GetMapping("/{id}")
 //    Chi cho phep user xem duoc dung thong tin cua minh
 //    Co nhan dau vao jwt
