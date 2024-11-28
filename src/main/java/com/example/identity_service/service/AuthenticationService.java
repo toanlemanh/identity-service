@@ -5,7 +5,7 @@ import com.example.identity_service.dto.request.IntrospectRequest;
 import com.example.identity_service.dto.response.AuthenticationResponse;
 import com.example.identity_service.dto.response.IntrospectResponse;
 import com.example.identity_service.entity.IdenUser;
-import com.example.identity_service.enums.Role;
+import com.example.identity_service.entity.Role;
 import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.exception.NotFoundException;
 import com.example.identity_service.exception.UnauthenticatedException;
@@ -52,6 +52,7 @@ public class AuthenticationService {
 
         // find username
         IdenUser user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_EXIST));
+        System.out.println("Role : " + user.getRoles().toString());
         //generate a JWT from username and password
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         boolean authenticated =  encoder.matches(request.getPassword(), user.getPassword());
@@ -59,6 +60,7 @@ public class AuthenticationService {
             throw new UnauthenticatedException(ErrorCode.UNAUTHENTICATED);
         }
         String token = generateToken(user);
+
 //login
         return AuthenticationResponse
                 .builder()
@@ -111,10 +113,10 @@ public class AuthenticationService {
         }
     }
     private String generateScope(IdenUser user){
-        Set<String> roles = user.getRoles();
+        Set<Role> roles = user.getRoles();
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (! CollectionUtils.isEmpty( roles )){
-            roles.forEach(role -> stringJoiner.add(role));
+            roles.forEach(role -> stringJoiner.add(role.getName()));
         }
         return stringJoiner.toString();
     }

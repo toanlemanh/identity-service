@@ -1,5 +1,6 @@
 package com.example.identity_service.dto.request;
 
+import com.example.identity_service.entity.Role;
 import com.example.identity_service.exception.ErrorCode;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -24,7 +25,7 @@ public class UserCreationRequest {
      String firstName;
      String lastName;
      LocalDate dob;
-     Set<String> roles;
+     Set<Role> roles;
 
 
 }

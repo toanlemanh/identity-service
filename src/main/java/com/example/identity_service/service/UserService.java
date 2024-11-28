@@ -4,7 +4,8 @@ import com.example.identity_service.dto.request.UserCreationRequest;
 import com.example.identity_service.dto.request.UserUpdateRequest;
 import com.example.identity_service.dto.response.UserResponse;
 import com.example.identity_service.entity.IdenUser;
-import com.example.identity_service.enums.Role;
+import com.example.identity_service.entity.Permission;
+import com.example.identity_service.entity.Role;
 import com.example.identity_service.exception.DuplicationException;
 import com.example.identity_service.exception.ErrorCode;
 import com.example.identity_service.exception.NotFoundException;
@@ -44,8 +45,11 @@ public class UserService {
         if ( userRepository.existsByUsername(request.getUsername()) )
              throw new DuplicationException(ErrorCode.USER_EXISTS);
 
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.USER.name());
+        HashSet<Role> roles = new HashSet<>();
+        HashSet<Permission> permissions = new HashSet<>();
+        permissions.add(new Permission("EDIT_DATA", "Edit user's data"));
+        Role userRole = new Role(com.example.identity_service.enums.Role.USER.name(), "ROLE_USER", permissions);
+        roles.add(userRole);
 
         // mapstruct to binding data between dto
         IdenUser user = userMapper.toUser(request);

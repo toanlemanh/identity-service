@@ -1,7 +1,8 @@
 package com.example.identity_service.configuration;
 
 import com.example.identity_service.entity.IdenUser;
-import com.example.identity_service.enums.Role;
+import com.example.identity_service.entity.Permission;
+import com.example.identity_service.entity.Role;
 import com.example.identity_service.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,8 +29,13 @@ public class ApplicationInitConfig {
     ApplicationRunner applicationRunner(UserRepository userRepository){
         return args -> {
            if (userRepository.findByUsername("admin").isEmpty() ){
-               HashSet roles = new HashSet<>();
-               roles.add(Role.ADMIN.name());
+               System.out.println("Starting");
+               HashSet<Role> roles = new HashSet<>();
+               HashSet<Permission> permissions = new HashSet<>();
+               permissions.add(new Permission("LIST_ALL_DATA", "Admin can list all data"));
+               Role adminRole = new Role(com.example.identity_service.enums.Role.ADMIN.name(), "ROLE_ADMIN", permissions);
+               roles.add(adminRole);
+               System.out.println("ROLE: " + roles.toString());
                IdenUser user = IdenUser.builder()
                        .username("admin")
                        .password(passwordEncoder.encode("admin"))
