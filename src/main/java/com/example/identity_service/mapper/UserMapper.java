@@ -14,13 +14,13 @@ import org.mapstruct.MappingTarget;
 public interface UserMapper {
     // map Creation request to entity
     IdenUser toUser(UserCreationRequest request);
+    // map entity to dto response
+    UserResponse toUserResponse(IdenUser user);
+    //khong update lai nhung attribute nay
     @Mapping(target = "username", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "roles", ignore = true)
     void toUpdateUser(@MappingTarget IdenUser user, UserUpdateRequest request);
-
-    // map entity to dto response
-    UserResponse toUserResponse(IdenUser user);
 
     //Mapping when source is different from target attribute
     //@Mapping("firstName", "lastName")

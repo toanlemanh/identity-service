@@ -80,6 +80,7 @@ public class UserController {
 //    Chi cho phep user xem duoc dung thong tin cua minh
 //    Co nhan dau vao jwt
 //    Check jwt claim set => issuer => get id === id
+    // => khong canmphai check nua, chung ta de co postauthorized xu ly
     public ApiResponse<UserResponse> getUserById (@PathVariable String id){
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info("Username >>" + authentication.getName());
@@ -87,11 +88,7 @@ public class UserController {
         ApiResponse<UserResponse> response = new ApiResponse<>();
         String nid = userService.getUserByName(authentication.getName()).getId();
         System.out.println("NID " + nid);
-        if ( userResponse.getId() == nid) {
-             response.setResult(userResponse);
-             return response;
-        }
-        else response.setMessage("You cannot get by id");
+        response.setResult(userResponse);
         return response;
     }
 

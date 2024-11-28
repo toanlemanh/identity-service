@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authorization.*;
+
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +34,7 @@ import java.util.stream.Stream;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 // make all field with not accessory being final
+
 public class UserService {
      UserRepository userRepository;
      UserMapper userMapper;
@@ -50,6 +53,7 @@ public class UserService {
         // encrypt password => set password in user entity, not in request ??
         // avoid leaking UserCreationRequest
         PasswordEncoder bcryptEncoder = new BCryptPasswordEncoder(10);
+        System.out.println(request.getPassword());
         user.setPassword( bcryptEncoder.encode(request.getPassword()) );
         System.out.println(user.getPassword());
         // Removed manual updating
@@ -65,15 +69,17 @@ public class UserService {
         log.info("In method list all users");
         return userRepository.findAll().stream().map(user -> userMapper.toUserResponse(user));
     }
-    @PostAuthorize("returnObject.username == authentication.name")
+    @PostAuthorize("returnObject.username == authentication.name or hasRole('ADMIN')")
+    // what's about ADMIN, it can access all products
     public UserResponse getUserById (String id) {
-        log.info("Ony if authenticated, this method will be called");
+        log.info("Ony if authorized, this method will be called");
        return userMapper.toUserResponse(
                //find IdenUser first then map to UserResponse (dto)
                userRepository
                        .findById(id)
                        .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND)));
     }
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getMyInfo (){
         log.info("Despite authentication, this method is still called");

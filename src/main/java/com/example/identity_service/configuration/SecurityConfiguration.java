@@ -22,7 +22,8 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
-
+//- task 1: config tra ve response theo format => exception handler va tra ve voi for mat response
+    //- task 2: config http status code
     private final String [] PUBLIC_ENDPOINT = {
              "/auth/token", "/auth/introspect", "/users"
     };
@@ -35,6 +36,7 @@ public class SecurityConfiguration {
 //        protect endpoint: register, login
         httpSecurity.authorizeHttpRequests(request -> request
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINT).permitAll()
+//                Using web security to protect some endpoints
 //                .requestMatchers(HttpMethod.GET, "/users").hasAuthority(ADMIN)
                 //or use hasRole(Role.ADMIN.name)
                         .anyRequest().authenticated()
@@ -52,7 +54,11 @@ public class SecurityConfiguration {
 //      overriding default JWTDecoder
 //      3 jobs: decodes, verifies and validates JWT
                         jwtConfigure.decoder( jwtDecoder() )
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        //when 401 authorized, it redirects to a page
+                        .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+        );
+
 //        JWTAuthenticationConverter
 //        => convert JWT to Collection of Authorities
         return httpSecurity.build();
@@ -76,8 +82,10 @@ public class SecurityConfiguration {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
 
+
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+
         return jwtAuthenticationConverter;
     }
     @Bean

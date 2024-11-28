@@ -49,7 +49,6 @@ public class AuthenticationService {
     protected String SIGNER_KEY;
 
     public AuthenticationResponse authenticate (AuthenticationRequest request) {
-        String encodingText = "";
 
         // find username
         IdenUser user = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_EXIST));
@@ -60,7 +59,7 @@ public class AuthenticationService {
             throw new UnauthenticatedException(ErrorCode.UNAUTHENTICATED);
         }
         String token = generateToken(user);
-
+//login
         return AuthenticationResponse
                 .builder()
                 .authenticated( true )
@@ -86,7 +85,7 @@ public class AuthenticationService {
                 .subject(user.getUsername())
                 .issueTime(new Date())
                 .issuer("identity.com") //issuer: domain
-                .claim("scope", generateScope(user))
+                .claim("scope", generateScope(user)) // role
                 .expirationTime(new Date(
                         Instant.now().plus(2, ChronoUnit.MINUTES).toEpochMilli()
                 ))
