@@ -15,6 +15,7 @@ public interface UserMapper {
     // map Creation request to entity
     IdenUser toUser(UserCreationRequest request);
     // map entity to dto response
+
     UserResponse toUserResponse(IdenUser user);
     //khong update lai nhung attribute nay
     @Mapping(target = "username", ignore = true)
